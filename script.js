@@ -17,6 +17,7 @@ class Mens {
   y;
   speedX;
   speedY;
+  breedte;
   isBesmet;
 
   constructor(newX, newY, newSpeedX, newSpeedY) {
@@ -30,14 +31,15 @@ class Mens {
 
   show() {
     // teken
-    noStroke;
-    fill(255, 255, 255);
-    rect(this.x, this.y, this.breedte, this.breedte);
-
-    if (this.isBesmet = true) {
-      fill(255, 100, 100);
-      rect(this.x, this.y, this.breedte, this.breedte);
+    noStroke();
+    if (this.isBesmet === true) {
+      fill(255, 0, 0);      // rood
     }
+    else {
+      fill(255, 255, 255);  // wit
+    }
+
+    rect(this.x, this.y, this.breedte, this.breedte);
   }
 
   update() {
@@ -52,6 +54,40 @@ class Mens {
     if (this.y <= 0 || this.y + this.breedte >= height) {
       this.speedY = this.speedY * -1;
     }
+  }
+
+  isOverlappend(andereMens) {
+    // zet teruggeefwaarde standaard op false
+    var overlappend = false;
+  
+    // zet teruggeefwaarde op true als er een overlap is
+    if ( // valt linkerbovenhoek binnen randen van 'andereMens'?
+         (this.x >= andereMens.x &&
+          this.x <= andereMens.x + andereMens.breedte &&
+          this.y >= andereMens.y &&
+          this.y <= andereMens.y + andereMens.breedte)
+        ||
+         // OF valt rechterbovenhoek binnen randen van 'andereMens'?
+         (this.x + this.breedte >= andereMens.x &&
+          this.x + this.breedte <= andereMens.x + andereMens.breedte &&
+          this.y >= andereMens.y &&
+          this.y <= andereMens.y + andereMens.breedte)
+        || // OF de linkeronderhoek?
+         (this.x >= andereMens.x &&
+          this.x <= andereMens.x + andereMens.breedte &&
+          this.y + this.breedte >= andereMens.y &&
+          this.y + this.breedte <= andereMens.y + andereMens.breedte)
+        || // OF de hoek rechtsonder?
+         (this.x >= andereMens.x &&
+          this.x <= andereMens.x + andereMens.breedte &&
+          this.y + this.breedte >= andereMens.y &&
+          this.y + this.breedte <= andereMens.y + andereMens.breedte)
+       ) {
+
+      overlappend = true;
+    }
+
+    return overlappend;
   }
 }
 
@@ -103,7 +139,28 @@ function setup() {
 function draw() {
   // zwarte achtergrond
   background(0, 0, 0);
-  
+
+  // ga alle mensen langs
+for (var i = 0; i < mensen.length; i++) {
+  var mensA = mensen[i];
+  // ga met mensA opnieuw alle mensen langs om te checken op overlap, behalve met zichzelf
+  for (var j = 0; j < mensen.length; j++) {
+    var mensB = mensen[j];
+    if (mensA != mensB) {
+      // check overlap
+      var mensenOverlappen = mensA.isOverlappend(mensB);
+      if (mensenOverlappen) {
+        // check of er een besmetting optreedt
+        if (mensA.isBesmet || mensB.isBesmet) {
+          // als er één besmet is, wordt ze allebei besmet
+          // als ze allebei besmet zijn, verandert deze code niets.
+          mensA.isBesmet = true;
+          mensB.isBesmet = true;
+        }
+      }
+    }
+  }
+}
 
   // ga alle waarden in de arrays af:
   for (var i = 0; i < mensen.length; i++) {
